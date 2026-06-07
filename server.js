@@ -19,7 +19,18 @@ app.use('/api/scan', scanRoutes);
 app.use('/api/threats', threatRoutes);
 
 const PORT = process.env.PORT || 5000;
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/quickphish';
+const rawMongoUri = process.env.MONGO_URI || 'mongodb://localhost:27017/quickphish';
+
+const normalizeMongoUri = (uri) => {
+  try {
+    const normalizedUri = uri.replace(/([?&])app(?=(&|$))/g, '$1').replace(/[?&]$/g, '');
+    return normalizedUri;
+  } catch (err) {
+    return uri;
+  }
+};
+
+const MONGO_URI = normalizeMongoUri(rawMongoUri);
 
 mongoose.connect(MONGO_URI)
   .then(() => {
